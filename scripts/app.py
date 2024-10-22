@@ -93,6 +93,13 @@ class MyApp:
         self.mp4button.pack_forget()
         self.mp3button = Radiobutton(self.mainWindow, text='MP3', value='mp3', variable=self.selectedFormat, bg="#d9eff1")
         self.mp4button.pack_forget()
+
+    def showResolutions(self, localVideo: DownloadVideo):
+        resolutions = localVideo.getResolutions_mp4()
+        
+        for res in resolutions:
+            radioBtn = Radiobutton(self.mainWindow, text=res, value=res, variable=self.selectedFormat, bg="#d9eff1", )
+            radioBtn.pack(padx=(40, 0), anchor='w')
         
     def Search_Video(self):
         self.link = self.inputText.get()
