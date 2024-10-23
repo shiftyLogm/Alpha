@@ -12,9 +12,12 @@ class MyApp:
         self.inputPath = None
         self.input_urlobj = None
         self.download_btnobj = None
+        self.selectedResolution = None
+        self.radioBtnRes = []
+        self.radioBtnAbrs = []
         self.mainWindow = Tk()
         self.mainWindow.title("Alpha")
-        self.mainWindow.geometry("1000x500")
+        self.mainWindow.geometry("1000x600")
         self.mainWindow.resizable(False, False)
         self.mainWindow.configure(bg="#d9eff1")
         self.titleLabel()
@@ -36,7 +39,7 @@ class MyApp:
     def labelUrl(self):
         label = Label(master=self.mainWindow, text="Coloque a URL no campo abaixo", bg="#d9eff1", font=("Consolas", 20),
                       anchor='w')
-        label.pack(padx=(20, 0), pady=(20, 0), anchor="w")
+        label.pack(padx=(20, 0), pady=(20, 0), anchor="w")                                                  
 
     def inputUrl(self):
         self.inputText = StringVar()
@@ -89,30 +92,73 @@ class MyApp:
 
     def formatOption(self):
         self.selectedFormat = StringVar(value='mp4')
-        self.mp4button = Radiobutton(self.mainWindow, text='MP4', value='mp4', variable=self.selectedFormat, bg="#d9eff1", )
+        self.mp4button = Radiobutton(self.mainWindow, text='MP4', value='mp4', variable=self.selectedFormat, bg="#d9eff1",)
         self.mp4button.pack_forget()
-        self.mp3button = Radiobutton(self.mainWindow, text='MP3', value='mp3', variable=self.selectedFormat, bg="#d9eff1")
+        self.mp3button = Radiobutton(self.mainWindow, text='MP3', value='mp3', variable=self.selectedFormat, bg="#d9eff1",)
         self.mp4button.pack_forget()
 
-    def showResolutions(self, localVideo: DownloadVideo):
-        resolutions = localVideo.getResolutions_mp4()
+    def showDownloadTypesInfos(self, typevalue):
+        self.selectedResolution = StringVar(value='144p')
         
-        for res in resolutions:
-            radioBtn = Radiobutton(self.mainWindow, text=res, value=res, variable=self.selectedFormat, bg="#d9eff1", )
-            radioBtn.pack(padx=(40, 0), anchor='w')
+        if (typevalue == 'mp4'):
+            y = 414
+            for button in self.radioBtnRes:
+                button.place(x=80, y=y)
+                print(button)
+                y += 20
+
+            for i in self.radioBtnAbrs:
+                i.place(x=0, y=0)
+            # map(lambda x: x.place(0, 0), self.radioBtnAbrs)
+
+        elif (typevalue == 'mp3'):
+            y = 414
+            for button in self.radioBtnAbrs:
+                button.place(x=80, y=y)
+                print(button)
+                y += 20
+
+            for i in self.radioBtnRes:
+                i.place(x=0, y=0)
+            # map(lambda x: x.place(0, 0), self.radioBtnRes)
         
     def Search_Video(self):
         self.link = self.inputText.get()
         self.path = self.inputPathVar.get()
         self.option = self.selectedFormat.get()
-        try:
-            self.video = DownloadVideo(link=self.link, path=self.path, format=self.option)
-            self.titleUrl.config(text=self.video.Title())
-            self.download_btnobj.config(state='normal')
-            self.mp4button.pack(padx=(20, 0), anchor='w')
-            self.mp3button.pack(padx=(20, 0), anchor='w')
-        except Exception:
-            tkinter.messagebox.showerror(title='Erro', messwage='URL inválido')
+
+        self.video = DownloadVideo(link=self.link, path=self.path, format=self.option)
+        self.titleUrl.config(text=self.video.Title())
+        self.download_btnobj.config(state='normal')
+        self.mp4button.pack(padx=(20, 0), anchor='w')
+        self.mp3button.pack(padx=(20, 0), anchor='w')
+        
+        resolutions = self.video.getResolutions_mp4()
+        abrs = self.video.getAudios_abr()
+
+        y = 414
+        for res in resolutions:
+            radio = Radiobutton(self.mainWindow, text=res, value=res, variable=self.selectedResolution, bg="#d9eff1")
+            radio.place(x=80, y=y)
+            self.radioBtnRes.append(radio)
+            y += 20
+        
+        print(self.radioBtnRes)
+
+        y = 414
+        for abr in abrs:
+            radio = Radiobutton(self.mainWindow, text=abr, value=abr, variable=self.selectedResolution, bg="#d9eff1")
+            radio.place(x=80, y=y)
+            self.radioBtnAbrs.append(radio)
+            y += 20
+
+        print(self.radioBtnAbrs)
+
+        self.mp4button.config(command=lambda: self.showDownloadTypesInfos(typevalue='mp4'))
+        self.mp3button.config(command=lambda: self.showDownloadTypesInfos(typevalue='mp3'))
+
+        # except Exception:
+        #     tkinter.messagebox.showerror(title='Erro', messwage='URL inválido')
 
     def Download_Video(self):
         self.video.format = self.selectedFormat.get()
