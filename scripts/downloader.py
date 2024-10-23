@@ -19,7 +19,6 @@ class DownloadVideo:
         
         resolutions = list()
         for res in streams:
-            print(res)
             resolutions.append(res.resolution)
 
         return resolutions
@@ -29,9 +28,8 @@ class DownloadVideo:
         streams = self.url.streams.filter(mime_type="audio/mp4", adaptive=True)
 
         resolutions = list()
-        for res in streams:
-            print(res)
-            resolutions.append(res.resolution)
+        for abr in streams:
+            resolutions.append(abr.abr)
 
         return resolutions
 
@@ -44,7 +42,3 @@ class DownloadVideo:
             return audio.download(output_path=self.path)
 
         video.download(output_path=self.path)
-
-test = DownloadVideo('https://www.youtube.com/watch?v=yNK3OnKR95A', 'C:\java', 'mp4')
-test.getResolutions_mp4()
-test.getAudios_abr()
