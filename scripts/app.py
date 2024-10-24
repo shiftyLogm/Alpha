@@ -1,4 +1,3 @@
-import tkinter
 import tkinter.messagebox
 from tkinter import *
 from tkinter import filedialog
@@ -98,29 +97,28 @@ class MyApp:
         self.mp4button.pack_forget()
 
     def showDownloadTypesInfos(self, typevalue):
-        self.selectedResolution = StringVar(value='144p')
         
         if (typevalue == 'mp4'):
+
             y = 414
             for button in self.radioBtnRes:
                 button.place(x=80, y=y)
                 print(button)
                 y += 20
 
-            for i in self.radioBtnAbrs:
-                i.place(x=0, y=0)
-            # map(lambda x: x.place(0, 0), self.radioBtnAbrs)
+            _ = [i.place(x=0, y=2000) for i in self.radioBtnAbrs]
+
 
         elif (typevalue == 'mp3'):
+            
             y = 414
             for button in self.radioBtnAbrs:
                 button.place(x=80, y=y)
                 print(button)
                 y += 20
 
-            for i in self.radioBtnRes:
-                i.place(x=0, y=0)
-            # map(lambda x: x.place(0, 0), self.radioBtnRes)
+            _ = [i.place(x=0, y=2000) for i in self.radioBtnRes]
+
         
     def Search_Video(self):
         self.link = self.inputText.get()
@@ -132,27 +130,23 @@ class MyApp:
         self.download_btnobj.config(state='normal')
         self.mp4button.pack(padx=(20, 0), anchor='w')
         self.mp3button.pack(padx=(20, 0), anchor='w')
-        
         resolutions = self.video.getResolutions_mp4()
         abrs = self.video.getAudios_abr()
 
+        self.selectedResolution = StringVar(value=resolutions[0])
+        print(self.selectedResolution)
+        
         y = 414
-        for res in resolutions:
+        for res in sorted(set(resolutions), key=lambda x: int(x.split('x')[0][:-1]), reverse=True):
             radio = Radiobutton(self.mainWindow, text=res, value=res, variable=self.selectedResolution, bg="#d9eff1")
             radio.place(x=80, y=y)
             self.radioBtnRes.append(radio)
             y += 20
         
-        print(self.radioBtnRes)
-
-        y = 414
-        for abr in abrs:
+        for abr in sorted(set(abrs), key=lambda x: int(x.split('x')[0][:-4]), reverse=True):
             radio = Radiobutton(self.mainWindow, text=abr, value=abr, variable=self.selectedResolution, bg="#d9eff1")
-            radio.place(x=80, y=y)
+            radio.place(x=0, y=2000)
             self.radioBtnAbrs.append(radio)
-            y += 20
-
-        print(self.radioBtnAbrs)
 
         self.mp4button.config(command=lambda: self.showDownloadTypesInfos(typevalue='mp4'))
         self.mp3button.config(command=lambda: self.showDownloadTypesInfos(typevalue='mp3'))
