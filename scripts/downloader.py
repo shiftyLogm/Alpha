@@ -1,5 +1,7 @@
 from pytubefix import YouTube
 from pytubefix.cli import on_progress
+from audiofix import fix_audio
+from os import remove
 
 class DownloadVideo:
 
@@ -8,7 +10,12 @@ class DownloadVideo:
         self.path = path
         self.format = format
         self.url = YouTube(self.link)
+        self.resolutionValue = None
 
+    # Setter da resolução
+    def setResolutionValue(self, value: str) -> None:
+        self.resolutionValue = value
+    
     # Retorno do título
     def Title(self) -> str:
         return self.url.title
@@ -34,11 +41,17 @@ class DownloadVideo:
         return resolutions
 
     # Método para download do video
-    def Download(self) -> None:
-        video = self.url.streams.get_by_resolution(self.resolution)
+    def Download(self):
+        video = self.url.streams.filter(res=self.resolutionValue).first()
+        
+        # if self.format == 'mp3':
+        #     audio = self.url.streams.filter(only_audio=True).first()
+        #     return audio.download(output_path=self.path, filename=f'{self.url.title}.mp3')
 
-        if self.format == 'mp3':
-            audio = self.url.streams.filter(only_audio=True).first()
-            return audio.download(output_path=self.path)
+        video_path = video.download(output_path=self.path)
+        audio = self.url.streams.filter(only_audio=True).first()
+        audio.download(output_path=self.path, filename=f'{self.url.title}.mp3')
 
-        video.download(output_path=self.path)
+        fix_audio(path_v=video_path, path_a=f'{self.path}/{self.url.title}.mp3', output_v_path_file=f'{self.path}/{self.url.title}aaa')
+
+        remove(f'{self.path}/{self.url.title}.mp3')
