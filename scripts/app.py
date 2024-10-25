@@ -103,7 +103,6 @@ class MyApp:
             y = 414
             for button in self.radioBtnRes:
                 button.place(x=80, y=y)
-                print(button)
                 y += 20
 
             _ = [i.place(x=0, y=2000) for i in self.radioBtnAbrs]
@@ -114,7 +113,6 @@ class MyApp:
             y = 414
             for button in self.radioBtnAbrs:
                 button.place(x=80, y=y)
-                print(button)
                 y += 20
 
             _ = [i.place(x=0, y=2000) for i in self.radioBtnRes]
@@ -134,7 +132,6 @@ class MyApp:
         abrs = self.video.getAudios_abr()
 
         self.selectedResolution = StringVar(value=resolutions[0])
-        print(self.selectedResolution)
         
         y = 414
         for res in sorted(set(resolutions), key=lambda x: int(x.split('x')[0][:-1]), reverse=True):
@@ -151,11 +148,10 @@ class MyApp:
         self.mp4button.config(command=lambda: self.showDownloadTypesInfos(typevalue='mp4'))
         self.mp3button.config(command=lambda: self.showDownloadTypesInfos(typevalue='mp3'))
 
-        # except Exception:
-        #     tkinter.messagebox.showerror(title='Erro', messwage='URL inválido')
-
     def Download_Video(self):
         self.video.format = self.selectedFormat.get()
+        self.video.setResolutionValue(self.selectedResolution.get())
+        print(self.selectedResolution.get())
         self.video.Download()
         print(self.video.format)
 
