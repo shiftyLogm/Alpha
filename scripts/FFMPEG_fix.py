@@ -5,7 +5,7 @@ def merge_ffmpeg(v_p: str, a_p: str, path: str, final_t: str) -> None:
 
     # This code is necessary because of the DASH format used on YouTube. 
     # Videos above 360p have their audio and video streams separated for better performance.
-    # Do not delete or move this folder to another location.
+    # Do not delete or move this file to another location.
     
     chdir(r"ffmpeg/bin")
 
