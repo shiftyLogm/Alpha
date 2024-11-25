@@ -2,6 +2,7 @@ from pytubefix import YouTube
 import os
 from scripts.FFMPEG_fix import merge_ffmpeg 
 from scripts.TITLE_fix import fix_title_video
+from scripts.REWRITING_fixes import *
 
 class DownloadVideo:
 
@@ -50,11 +51,19 @@ class DownloadVideo:
 
         fixed_t = fix_title_video(t_v=self.url.title)
 
-        video_path = video.download(output_path=self.path, filename=f'{fixed_t}.mp4')
+        if (verifyFile(f"{self.path}/{fixed_t}")):
+            increaseTitle(self.path, fixed_t)
 
-        audio = self.url.streams.filter(only_audio=True).first()
+        if self.format == 'mp4':
+
+            video_path = video.download(output_path=self.path, filename=f'{fixed_t}.mp4')
+
+            audio = self.url.streams.filter(only_audio=True).first()
+            
+            audio_path = audio.download(output_path=self.path, filename=f'{fixed_t}.mp3')
         
-        audio_path = audio.download(output_path=self.path, filename=f'{fixed_t}.mp3')
+        else: 
+            return self.url.streams.filter(only_audio=True).first().download(output_path=self.path, filename=f'{fixed_t}.mp3')
 
         # Audio fix with FFMPEG        
         merge_ffmpeg(
