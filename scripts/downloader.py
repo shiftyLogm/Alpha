@@ -1,8 +1,8 @@
 from pytubefix import YouTube
-import os
 from scripts.FFMPEG_fix import merge_ffmpeg 
 from scripts.TITLE_fix import fix_title_video
 from scripts.REWRITING_fixes import *
+from tempfile import TemporaryDirectory
 
 class DownloadVideo:
 
@@ -49,29 +49,27 @@ class DownloadVideo:
     def Download(self):
         video = self.url.streams.filter(res=self.resolutionValue).first()
 
-        fixed_t = fix_title_video(t_v=self.url.title)
+        fixed_t = fix_title_video(t_v=self.url.title).strip().replace(" ", "_")
 
-        if (verifyFile(f"{self.path}/{fixed_t}")):
-            increaseTitle(self.path, fixed_t)
+        if (verifyFile(f"{self.path}/{fixed_t}.{self.format}")):
+            fixed_t = increaseTitle(self.path, fixed_t, self.format)
 
-        if self.format == 'mp4':
+        if self.format == 'mp3': 
+            return self.url.streams.filter(only_audio=True).first().download(output_path=self.path, filename=f'{fixed_t}.mp3')
 
-            video_path = video.download(output_path=self.path, filename=f'{fixed_t}.mp4')
+
+        with TemporaryDirectory() as tmp_dir:
+            
+            video_path = video.download(output_path=tmp_dir, filename=f'{fixed_t}.mp4')
 
             audio = self.url.streams.filter(only_audio=True).first()
             
-            audio_path = audio.download(output_path=self.path, filename=f'{fixed_t}.mp3')
-        
-        else: 
-            return self.url.streams.filter(only_audio=True).first().download(output_path=self.path, filename=f'{fixed_t}.mp3')
+            audio_path = audio.download(output_path=tmp_dir, filename=f'{fixed_t}.mp3')
 
-        # Audio fix with FFMPEG        
-        merge_ffmpeg(
-            v_p=video_path,
-            a_p=audio_path,
-            path=self.path,
-            final_t=f"{fixed_t.strip().replace(" ", "_")}"    
-        )
-
-        os.remove(video_path)
-        os.remove(audio_path)
+            # Audio fix with FFMPEG        
+            merge_ffmpeg(
+                v_p=video_path,
+                a_p=audio_path,
+                path=self.path,
+                final_t=f"{fixed_t}"    
+            )
